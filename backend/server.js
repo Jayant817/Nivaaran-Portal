@@ -19,6 +19,11 @@ app.use('/api/complaints', complaintRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/ai', aiRoutes)
 
+// Basic root route
+app.get('/', (req, res) => {
+  res.json({ message: 'Nivaaran Portal API is running successfully!' })
+})
+
 // Global error handler (must be last)
 app.use(errorMiddleware)
 
