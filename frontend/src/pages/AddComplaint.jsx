@@ -36,7 +36,7 @@ function AddComplaint() {
     try {
       const aiRes = await analyzeComplaint({ description: data.description })
       setAiResult(aiRes.data)
-    } catch (err) {
+    } catch {
       setAiError('Complaint registered ✅ but AI analysis is temporarily unavailable.')
     } finally {
       setSubmitting(false)

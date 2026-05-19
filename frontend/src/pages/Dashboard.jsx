@@ -1,19 +1,13 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { getComplaints } from '../api/complaintApi'
-import { AuthContext } from '../context/AuthContext'
 import './Dashboard.css'
 
 function Dashboard() {
   const [complaints, setComplaints] = useState([])
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({ total: 0, pending: 0, inProgress: 0, resolved: 0 })
-  const { user } = useContext(AuthContext) // Assuming user details might be in context, or just say 'User'
-
-  useEffect(() => {
-    fetchData()
-  }, [])
 
   const fetchData = async () => {
     try {
@@ -34,6 +28,11 @@ function Dashboard() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchData()
+  }, [])
 
   // Get recent 5 complaints
   const recentComplaints = complaints.slice(0, 5)

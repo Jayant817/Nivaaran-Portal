@@ -34,10 +34,6 @@ function ComplaintList() {
   const [updatingId, setUpdatingId] = useState(null)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    fetchComplaints()
-  }, [selectedCategory])
-
   const fetchComplaints = async () => {
     setLoading(true)
     setError('')
@@ -51,6 +47,12 @@ function ComplaintList() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchComplaints()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory])
 
   const handleSearch = async (e) => {
     e.preventDefault()
