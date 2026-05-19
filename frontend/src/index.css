@@ -1,0 +1,21 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Ensure footer sticks to bottom on short pages */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* AppRoutes grows, footer stays small */
+.app-wrapper > *:first-child {
+  flex: 1;
+}
+
+.app-wrapper > *:last-child {
+  flex-shrink: 0;
+}
