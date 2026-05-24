@@ -8,7 +8,7 @@ const callOpenRouter = (messages) => {
   return new Promise((resolve, reject) => {
 
     const body = JSON.stringify({
-      model: process.env.OPENROUTER_MODEL || 'mistralai/mistral-7b-instruct',
+      model: process.env.OPENROUTER_MODEL || 'openrouter/free',
       messages
       // NOTE: response_format removed — not supported by all free models
     })

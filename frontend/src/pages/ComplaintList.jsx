@@ -2,7 +2,15 @@ import { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import { getComplaints, searchComplaints, deleteComplaint } from '../api/complaintApi'
 import { updateComplaintStatus } from '../api/complaintApi'
+import { analyzeComplaint } from '../api/aiApi'
 import './ComplaintList.css'
+
+const PRIORITY_COLORS = {
+  Critical: '#ef4444',
+  High: '#f97316',
+  Medium: '#eab308',
+  Low: '#22c55e'
+}
 
 const CATEGORIES = [
   'All',
@@ -33,6 +41,23 @@ function ComplaintList() {
   const [searchInput, setSearchInput] = useState('')
   const [updatingId, setUpdatingId] = useState(null)
   const [error, setError] = useState('')
+  const [aiLoading, setAiLoading] = useState({})
+  const [aiResults, setAiResults] = useState({})
+  const [aiErrors, setAiErrors] = useState({})
+
+  const handleAIAnalyze = async (id, description) => {
+    setAiLoading(prev => ({ ...prev, [id]: true }))
+    setAiErrors(prev => ({ ...prev, [id]: '' }))
+    try {
+      const res = await analyzeComplaint({ description })
+      setAiResults(prev => ({ ...prev, [id]: res.data }))
+    } catch (err) {
+      const errMsg = err.response?.data?.message || 'AI analysis failed. Please try again.'
+      setAiErrors(prev => ({ ...prev, [id]: errMsg }))
+    } finally {
+      setAiLoading(prev => ({ ...prev, [id]: false }))
+    }
+  }
 
   const fetchComplaints = async () => {
     setLoading(true)
@@ -210,13 +235,74 @@ function ComplaintList() {
                     {updatingId === complaint._id && <span className="updating-text">Updating...</span>}
                   </div>
 
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDelete(complaint._id)}
-                  >
-                    🗑️ Delete
-                  </button>
+                  <div className="card-action-buttons">
+                    <button
+                      className="ai-analyze-action-btn"
+                      onClick={() => handleAIAnalyze(complaint._id, complaint.description)}
+                      disabled={aiLoading[complaint._id]}
+                    >
+                      {aiLoading[complaint._id] ? (
+                        <>
+                          <span className="spinner-inline"></span> Analyzing...
+                        </>
+                      ) : '✨ AI Analyze'}
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDelete(complaint._id)}
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
                 </div>
+
+                {/* AI Analysis Result Panel */}
+                {(aiLoading[complaint._id] || aiResults[complaint._id] || aiErrors[complaint._id]) && (
+                  <div className="inline-ai-analysis animate-fade-in">
+                    {aiLoading[complaint._id] && (
+                      <div className="ai-inline-loading">
+                        <span className="spinner-inline"></span> Analyzing complaint with AI agent...
+                      </div>
+                    )}
+
+                    {aiErrors[complaint._id] && (
+                      <div className="ai-inline-error">
+                        ⚠️ {aiErrors[complaint._id]}
+                      </div>
+                    )}
+
+                    {aiResults[complaint._id] && (
+                      <div className="ai-inline-result">
+                        <div className="ai-inline-header">
+                          <span className="ai-inline-badge">🤖 AI Agent Feedback</span>
+                        </div>
+                        <div className="ai-inline-grid">
+                          <div className="ai-inline-item">
+                            <span className="ai-inline-label">Priority / Urgency</span>
+                            <span
+                              className="ai-inline-priority"
+                              style={{ background: PRIORITY_COLORS[aiResults[complaint._id].priority] || '#6b7280' }}
+                            >
+                              {aiResults[complaint._id].priority}
+                            </span>
+                          </div>
+                          <div className="ai-inline-item">
+                            <span className="ai-inline-label">Suggested Department</span>
+                            <span className="ai-inline-val dept-val">🏛️ {aiResults[complaint._id].department}</span>
+                          </div>
+                          <div className="ai-inline-item full">
+                            <span className="ai-inline-label">AI Summarized Incident</span>
+                            <span className="ai-inline-val summary-val">"{aiResults[complaint._id].summary}"</span>
+                          </div>
+                          <div className="ai-inline-item full ai-inline-response">
+                            <span className="ai-inline-label">Auto-Generated Response Message</span>
+                            <p className="ai-inline-text">"{aiResults[complaint._id].responseMessage}"</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="card-date">
                   {complaint.createdAt
