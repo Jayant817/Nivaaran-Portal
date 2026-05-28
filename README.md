@@ -1,6 +1,6 @@
 # ⚖️ Nivaaran Portal — AI-Powered Complaint Management System
 
-![Nivaaran Portal Hero](https://via.placeholder.com/1000x500/111827/ffffff?text=Nivaaran+Portal+-+AI+Complaint+Management)
+![Nivaaran Portal Hero](https://nivaaran-portal-1.onrender.com/)
 
 > A modern, intelligent, and seamless platform for public grievance management. Nivaaran Portal uses Artificial Intelligence to instantly analyze, prioritize, and route complaints to the appropriate government or municipal departments.
 
